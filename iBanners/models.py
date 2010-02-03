@@ -27,6 +27,9 @@ PRIORITY = (
 
 class Zone(models.Model):
     site = models.ForeignKey(Site, verbose_name=u"сайт",)
+    code = models.CharField(max_length=15, verbose_name=u"код", \
+                help_text=u"Используется в HTML коде для задания стилей. Оставте пустым, если вам это не нужно.", \
+                blank=True, null=True)
     name = models.CharField(max_length=50, verbose_name=u"название")
     description = models.CharField(max_length=255, verbose_name=u"описание")
     price = models.IntegerField(verbose_name=u"Цена месяца показа")
@@ -94,7 +97,7 @@ class Banner(models.Model):
     end_date = models.DateTimeField(null=True, blank=True, verbose_name=u"Дата окончания")
     # Прорабатываем баннеры
     swf_file = models.FileField(upload_to=os.path.join('ibas', 'swf'), blank=True, verbose_name=u"Путь до SWF файла", help_text=u"Только для Flash баннеров", null=True)
-    img_file = models.FileField(upload_to=os.path.join('ibas', 'img'), blank=True, verbose_name=u"Путь до графического файла", help_text=u"Использовать для графических баннеров и для замены Flash баннеров в случае отсутствия у пользователя flash-плеера", null=True)
+    img_file = models.ImageField(upload_to=os.path.join('ibas', 'img'), blank=True, verbose_name=u"Путь до графического файла", help_text=u"Использовать для графических баннеров и для замены Flash баннеров в случае отсутствия у пользователя flash-плеера", null=True)
     alt = models.CharField(max_length=100, blank=True, verbose_name=u"alt текст", default="")
     comment = models.TextField(max_length=255, blank=True, verbose_name=u"Комментарий", default="")
     html_text = models.TextField(blank=True, null=False, default="", verbose_name=u"HTML текст")

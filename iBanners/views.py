@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
-from django.contrib.sites.models import Site
-import re, os, random
 from datetime import datetime as dt
-
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from django.template import RequestContext, Context
-from django.template.loader import get_template
-from django.shortcuts import render_to_response, get_object_or_404
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-
 from django.conf import settings
-from models import Zone, Banner, Campaign
+from django.contrib.sites.models import Site
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.template import Context
+from django.template.loader import get_template
+from models import Zone, Banner
+import random
+
 
 def banner(request, banner_id):
-    b = get_object_or_404(Banner,id=banner_id)
+    b = get_object_or_404(Banner, id=banner_id)
     b.clicks = b.clicks + 1
     b.save()
     return HttpResponseRedirect(b.foreign_url)
 
-def zones(request,zone_id):
+def zones(request, zone_id):
     template = get_template("iBanners/zones.html")
     zone = Zone.objects.get(id=zone_id)
     context = Context({
@@ -32,7 +30,7 @@ def zones(request,zone_id):
 
 # Функиция, возвращающая HTML код для ibanners
 def gen_banner_code(request, zone_id, var=False):
-    pr = {1:3,2:5,3:7,4:9,5:11,6:13,7:15,8:17,9:20} # Распределение вероятностей
+    pr = {1:3, 2:5, 3:7, 4:9, 5:11, 6:13, 7:15, 8:17, 9:20} # Распределение вероятностей
     probabilities = []
 
     site = Site.objects.get_current()
@@ -46,8 +44,8 @@ def gen_banner_code(request, zone_id, var=False):
 
     # Поиск по переменным
     if not var:
-        var = request.GET.get('var',False)
-    varnot = request.GET.get('varnot',False)
+        var = request.GET.get('var', False)
+    varnot = request.GET.get('varnot', False)
 
     if zone:
         banners = Banner.objects.filter(
@@ -65,7 +63,6 @@ def gen_banner_code(request, zone_id, var=False):
         if count == 1:
             banner = banners[0]
         elif count > 1:
-            url = ""
             # Поиск самого крутого баннера в зоне, в зависимости от самой крутой кампании
             for b in banners:
                 if ((b.shows < b.max_shows) or (b.max_shows == 0)) and ((b.clicks < b.max_clicks) or (b.max_clicks == 0)):
@@ -79,7 +76,7 @@ def gen_banner_code(request, zone_id, var=False):
                 if banners2.count() > 0:
                     for b in banners2:
                         if ((b.shows < b.max_shows) or (b.max_shows == 0)) and ((b.clicks < b.max_clicks) or (b.max_clicks == 0)):
-                            for x in range(pr[b.campaign.priority]):
+                            for unused in range(pr[b.campaign.priority]):
                                 probabilities.append(b.campaign.priority)
                     priority = random.choice(probabilities)
                     banners2 = Banner.objects.filter(
@@ -87,7 +84,7 @@ def gen_banner_code(request, zone_id, var=False):
                         (Q(campaign__end_date__gte=dt.now()) | Q(campaign__end_date__isnull=True)),
                         (Q(begin_date__lte=dt.now()) | Q(begin_date__isnull=True)),
                         (Q(end_date__gte=dt.now()) | Q(end_date__isnull=True)),
-                        zones=zone,campaign__priority=priority).exclude(campaign__client__in=request.META['ibanners.clients']).order_by('-campaign__priority')
+                        zones=zone, campaign__priority=priority).exclude(campaign__client__in=request.META['ibanners.clients']).order_by('-campaign__priority')
                     # Если в вероятность попал один баннер
                     if banners2.count() == 1:
                         banner = banners2[0]
@@ -122,8 +119,8 @@ def gen_banner_code(request, zone_id, var=False):
             # Определяем пути до файла
             swf_file = str(banner.swf_file)
             img_file = str(banner.img_file)
-            swf_banner_name = swf_file[swf_file.rfind('/')+1:]
-            img_banner_name = img_file[img_file.rfind('/')+1:]
+            swf_banner_name = swf_file[swf_file.rfind('/') + 1:]
+            img_banner_name = img_file[img_file.rfind('/') + 1:]
             swf_url = ""
             img_url = ""
             # Флэш баннер
@@ -140,7 +137,6 @@ def gen_banner_code(request, zone_id, var=False):
             code = u"%s" % zone.html_pre_banner
 
             # flash баннеры
-            url2 = ''
             if banner.banner_type == 'f':
                 banner_href = u"%sibas/%s/" % (banner_site_url, banner.id)
                 template = get_template("iBanners/gen_banner_code.html")
@@ -156,9 +152,28 @@ def gen_banner_code(request, zone_id, var=False):
                 code += template.render(context)
             # графические баннеры
             elif banner.banner_type == 'g':
-                if banner.foreign_url: code += u"""<a href="%sibas/%s/" target="_blank" style="border-width:0;">""" % (banner_site_url, banner.id)
-                code += u"""<img src="%s" alt="%s" width="%s" height="%s" style="border-width:0"/>""" % (img_url, banner.alt, banner.width, banner.height)
-                if banner.foreign_url: code += u"""</a>"""
+                if banner.foreign_url:
+                    id = zone.code
+                    if id:
+                        id = ' id="%s"' % id
+                    code += u"""<a href="%sibas/%s/"%s>""" % (banner_site_url, banner.id, id)
+                if banner.width:
+                    bwidth = """width="%s" """ % banner.width
+                else:
+                    try:
+                        bwidth = """width="%s" """ % banner.img_file.width
+                    except:
+                        bwidth = ''
+                if banner.height:
+                    bheight = """height="%s" """ % banner.height
+                else:
+                    try:
+                        bheight = """height="%s" """ % banner.img_file.height
+                    except:
+                        bheight = ''
+                code += u"""<img src="%s" alt="%s" %s%s/>""" % (img_url, banner.alt, bwidth, bheight)
+                if banner.foreign_url:
+                    code += u"""</a>"""
             # html баннеры
             elif banner.banner_type == 'h':
                 code += banner.html_text
