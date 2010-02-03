@@ -134,7 +134,7 @@ def gen_banner_code(request, zone_id, var=False):
                 try: img_url = u"%sibas/img/%s" % (settings.MEDIA_URL, img_banner_name)
                 except: img_url = ""
 
-            code = u"%s" % zone.html_pre_banner
+            code = u""
 
             # flash баннеры
             if banner.banner_type == 'f':
