@@ -27,9 +27,6 @@ PRIORITY = (
 
 class Zone(models.Model):
     site = models.ForeignKey(Site, verbose_name=u"сайт",)
-    code = models.CharField(max_length=15, verbose_name=u"код", \
-                help_text=u"Используется в HTML коде для задания стилей. Оставте пустым, если вам это не нужно.", \
-                blank=True, null=True)
     name = models.CharField(max_length=50, verbose_name=u"название")
     description = models.CharField(max_length=255, verbose_name=u"описание")
     price = models.IntegerField(verbose_name=u"Цена месяца показа")

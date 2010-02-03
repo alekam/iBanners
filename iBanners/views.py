@@ -153,10 +153,7 @@ def gen_banner_code(request, zone_id, var=False):
             # графические баннеры
             elif banner.banner_type == 'g':
                 if banner.foreign_url:
-                    id = zone.code
-                    if id:
-                        id = ' id="%s"' % id
-                    code += u"""<a href="%sibas/%s/"%s>""" % (banner_site_url, banner.id, id)
+                    code += u"""<a href="%sibas/%s/">""" % (banner_site_url, banner.id)
                 if banner.width:
                     bwidth = """width="%s" """ % banner.width
                 else:
