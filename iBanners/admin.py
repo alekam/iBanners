@@ -40,7 +40,8 @@ class BannerAdmin(admin.ModelAdmin):
     )
     search_fields = ('name','campaign__name','campaign__client__name', 'comment', 'html_text')
     list_display_links = ('name',)
-
+    list_filter = ('zones',)
+    
 
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ('client','name','priority','begin_date','end_date')
