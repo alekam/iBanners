@@ -9,7 +9,6 @@ from django.core.urlresolvers import get_callable, RegexURLResolver, get_resolve
 from django.template import Node, NodeList, TextNode, TemplateSyntaxError, Library, resolve_variable
 from django.db.models import Q
 
-from settings import MEDIA_URL, SITE_URL
 from iBanners.models import Zone, Banner, Campaign
 from iBanners.views import gen_banner_code
 

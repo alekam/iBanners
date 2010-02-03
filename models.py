@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.sites.models import Site
-from settings import MEDIA_ROOT, MEDIA_URL
+from django.conf import settings
 
 BANNERS_TYPE = (
     ('g',u'графический баннер'),
@@ -92,8 +92,8 @@ class Banner(models.Model):
     begin_date = models.DateTimeField(null=True,blank=True,verbose_name=u"Дата начала")
     end_date = models.DateTimeField(null=True,blank=True,verbose_name=u"Дата окончания")
     # Прорабатываем баннеры
-    swf_file = models.FileField(upload_to=MEDIA_ROOT+"/ibas/swf/",blank=True,verbose_name=u"Путь до SWF файла",help_text=u"Только для Flash баннеров",null=True)
-    img_file = models.FileField(upload_to=MEDIA_ROOT+"/ibas/img/",blank=True,verbose_name=u"Путь до графического файла",help_text=u"Использовать для графических баннеров и для замены Flash баннеров в случае отсутствия у пользователя flash-плеера",null=True)
+    swf_file = models.FileField(upload_to=settings.MEDIA_ROOT+"/ibas/swf/",blank=True,verbose_name=u"Путь до SWF файла",help_text=u"Только для Flash баннеров",null=True)
+    img_file = models.FileField(upload_to=settings.MEDIA_ROOT+"/ibas/img/",blank=True,verbose_name=u"Путь до графического файла",help_text=u"Использовать для графических баннеров и для замены Flash баннеров в случае отсутствия у пользователя flash-плеера",null=True)
     alt = models.CharField(max_length=100,blank=True,verbose_name=u"alt текст",default="")
     comment = models.TextField(max_length=255,blank=True,verbose_name=u"Комментарий",default="")
     html_text = models.TextField(blank=True,null=False,default="",verbose_name=u"HTML текст")
@@ -118,7 +118,7 @@ class Banner(models.Model):
     get_banner_zones.allow_tags = True
 
     def get_campaign_satus(self):
-        print dir(self.campaign)
+        #print dir(self.campaign)
         return "%s - %s" % (self.campaign.priority, self.campaign.get_priority_display())
     get_campaign_satus.short_description = u'Статус кампании'
     get_campaign_satus.allow_tags = True

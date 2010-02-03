@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.sites.models import Site
 import re, os, random
 from datetime import datetime as dt
 
@@ -9,8 +10,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
-from settings import MEDIA_URL, SITE_URL
-from iBanners.models import Zone, Banner, Campaign
+from django.conf import settings
+from models import Zone, Banner, Campaign
 
 def banner(request, banner_id):
     b = get_object_or_404(Banner,id=banner_id)
@@ -23,7 +24,7 @@ def zones(request,zone_id):
     zone = Zone.objects.get(id=zone_id)
     context = Context({
         "banner_code":gen_banner_code(request, zone_id),
-        "MEDIA_URL":MEDIA_URL,
+        "MEDIA_URL":settings.MEDIA_URL,
         "html_after_banner":zone.html_after_banner,
         "html_pre_banner":zone.html_pre_banner
     })
@@ -34,12 +35,8 @@ def gen_banner_code(request, zone_id, var=False):
     pr = {1:3,2:5,3:7,4:9,5:11,6:13,7:15,8:17,9:20} # Распределение вероятностей
     probabilities = []
 
-    banner_site_url = SITE_URL
-    try:
-        from settings import BANNER_SITE_URL
-        banner_site_url = BANNER_SITE_URL
-    except:
-        pass
+    site = Site.objects.get_current()
+    banner_site_url = getattr(settings, 'BANNER_SITE_URL', 'http://%s/' % site.domain)
 
     if not request.META.has_key('ibanners.clients'): request.META['ibanners.clients'] = []
 
@@ -131,13 +128,13 @@ def gen_banner_code(request, zone_id, var=False):
             img_url = ""
             # Флэш баннер
             if banner.banner_type == 'f':
-                try: swf_url = u"%sibas/swf/%s" % (MEDIA_URL, swf_banner_name)
+                try: swf_url = u"%sibas/swf/%s" % (settings.MEDIA_URL, swf_banner_name)
                 except: swf_url
-                try: img_url = u"%sibas/img/%s" % (MEDIA_URL, img_banner_name)
+                try: img_url = u"%sibas/img/%s" % (settings.MEDIA_URL, img_banner_name)
                 except: img_url = ""
             # Графический баннер
             if banner.banner_type == 'g':
-                try: img_url = u"%sibas/img/%s" % (MEDIA_URL, img_banner_name)
+                try: img_url = u"%sibas/img/%s" % (settings.MEDIA_URL, img_banner_name)
                 except: img_url = ""
 
             code = u"%s" % zone.html_pre_banner

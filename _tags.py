@@ -5,7 +5,7 @@ from django.utils.encoding import smart_str
 from django.core.urlresolvers import get_callable, RegexURLResolver, get_resolver
 from django.template import Node, NodeList, TextNode, TemplateSyntaxError, Library, resolve_variable
 from ibanners.models import Zone, Banner, Campaign
-from settings import MEDIA_URL
+from django.conf import settings
 import re, os, random
 from datetime import datetime as dt
 from django.db.models import Q
@@ -82,7 +82,7 @@ class BannerNode(template.Node):
             if banner:
                 banner.shows = banner.shows + 1
                 banner.save()
-                url = u"%sbanners/%s" % (MEDIA_URL, os.path.basename(banner.file.path))
+                url = u"%sbanners/%s" % (settings.MEDIA_URL, os.path.basename(banner.file.path))
                 #print banner.file
 
                 code = u""
