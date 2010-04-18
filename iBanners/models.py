@@ -98,6 +98,7 @@ class Banner(models.Model):
     alt = models.CharField(max_length=100, blank=True, verbose_name=u"alt текст", default="")
     comment = models.TextField(max_length=255, blank=True, verbose_name=u"Комментарий", default="")
     html_text = models.TextField(blank=True, null=False, default="", verbose_name=u"HTML текст")
+    allow_template_tags = models.BooleanField(blank=True, null=False, default=False, verbose_name=u"Разрешены шаблонные тэги Django", help_text=u'Только для HTML баннеров. Разрешает использование в коде шаблонные тэги Django.') 
     var = models.CharField(max_length=255, verbose_name=u"Переменная", blank=True, default="", null=True)
 
     class Meta:

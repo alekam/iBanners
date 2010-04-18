@@ -23,7 +23,7 @@ class BannerAdmin(admin.ModelAdmin):
         }),
         (u"Баннер", {
             'classes': ('wide',),
-            'fields': ('swf_file', 'img_file', 'alt', 'html_text')
+            'fields': ('swf_file', 'img_file', 'alt', 'html_text', 'allow_template_tags')
         }),
         (u"Размеры", {
             'classes': ('wide'),

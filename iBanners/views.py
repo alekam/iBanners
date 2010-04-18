@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.template import Context
+from django.template import Context, Template
 from django.template.loader import get_template
 from models import Zone, Banner
 import random
@@ -173,7 +173,11 @@ def gen_banner_code(request, zone_id, var=False):
                     code += u"""</a>"""
             # html баннеры
             elif banner.banner_type == 'h':
-                code += banner.html_text
+                if banner.allow_template_tags:
+                    t = Template(banner.html_text)
+                    code += t.render(Context({}))
+                else:
+                    code += banner.html_text
             hbanner = code
         else:
             pass
