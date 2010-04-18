@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re, os, random
-from datetime import datetime as dt
-
 from django import template
-from django.utils.encoding import smart_str
-from django.core.urlresolvers import get_callable, RegexURLResolver, get_resolver
-from django.template import Node, NodeList, TextNode, TemplateSyntaxError, Library, resolve_variable
-from django.db.models import Q
-
-from iBanners.models import Zone, Banner, Campaign
 from iBanners.views import gen_banner_code
+
 
 class BannerNode(template.Node):
     def __init__(self, request, zone_id, var):
@@ -27,7 +19,11 @@ class BannerNode(template.Node):
     def render(self, context):
         if self.var:
             self.var = str(self.var.resolve(context))
-        return gen_banner_code(self.request.resolve(context), self.zone_id, self.var)
+        try:
+            return gen_banner_code(self.request.resolve(context), \
+                                   self.zone_id, self.var)
+        except template.VariableDoesNotExist:
+            return ''
 
 # Тег для загрузки баннеров
 def do_banner(parser, token):
